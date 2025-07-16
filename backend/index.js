@@ -10,11 +10,14 @@ console.log('Port:', PORT);
 
 app.use(cors({
   origin: [
-    'https://leetcode-tracker-pnubpybtp-reapers-projects-d03fad26.vercel.app',
+    'https://leetcode-tracker-kal2f1gkr-reapers-projects-d03fad26.vercel.app',
     'http://localhost:3000' 
-  ]
+  ],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
-
+app.options('*', cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
