@@ -1,23 +1,25 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# IDE and editor configuration files
+.idea/
+.vscode/
+*.swp
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# production
-/build
-
-# misc
+# Operating System files
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+Thumbs.db
 
+# Log files
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Dependency directories
+# These are the most important lines for a monorepo
+backend/node_modules/
+frontend/node_modules/
+
+# Environment variables
+# It's a best practice to ignore all .env files and commit a template instead
+.env
+.env.*
+!.env.example
