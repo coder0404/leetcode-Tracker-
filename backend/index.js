@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors({
   origin: [
-    'https://leetcode-tracker-gamma.vercel.app', 
+    'https://leetcode-tracker-pnubpybtp-reapers-projects-d03fad26.vercel.app', 
     'http://localhost:3000' 
   ]
 }));
