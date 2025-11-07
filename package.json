@@ -1,5 +1,9 @@
 {
   "scripts": {
     "install-all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "redis": "^5.9.0"
   }
 }

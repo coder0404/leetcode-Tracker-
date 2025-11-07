@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const redis = require('redis');
 
 const app = express();
 const PORT = 5000;
@@ -20,6 +21,13 @@ app.use(cors({
 app.options('*', cors());
 app.use(express.json());
 
+const redisClient = redis.createClient({
+  url: process.env.REDIS_URL || 'redis://localhost:6379'
+});
+
+redisClient.on('error', (err) => console.log('Redis Client Error', err));
+redisClient.connect();
+
 app.get('/', (req, res) => {
   console.log('Health check requested');
   res.json({ message: 'LeetCode Tracker API is running!', status: 'healthy' });
@@ -28,10 +36,29 @@ app.get('/', (req, res) => {
 app.post('/leetcode', async (req, res) => {
   console.log('LeetCode request received for username:', req.body.username);
   
-  const { username } = req.body;
+  const { username, refresh } = req.body; // We can now accept a 'refresh' flag
+  const cacheKey = `leetcode:${username}`;
+  const CACHE_EXPIRATION_SECONDS = 3600; // 1 hour
 
   if (!username) {
     return res.status(400).json({ error: 'Username is required' });
+  }
+
+  // --- Caching Logic ---
+  if (!refresh) {
+    try {
+      const cachedData = await redisClient.get(cacheKey);
+      if (cachedData) {
+        console.log(`CACHE HIT for ${username}`);
+        return res.json(JSON.parse(cachedData));
+      }
+      console.log(`CACHE MISS for ${username}`);
+    } catch (err) {
+      console.error('Redis GET error:', err);
+      // If Redis fails, we proceed to fetch from API anyway
+    }
+  } else {
+    console.log(`REFRESH requested for ${username}, bypassing cache.`);
   }
 
   // GraphQL query
@@ -80,7 +107,20 @@ app.post('/leetcode', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json(response.data.data.matchedUser);
+    const userData = response.data.data.matchedUser;
+
+    // --- Store in Cache ---
+    try {
+      await redisClient.set(cacheKey, JSON.stringify(userData), {
+        EX: CACHE_EXPIRATION_SECONDS,
+      });
+      console.log(`SAVED to cache: ${username}`);
+    } catch (err) {
+      console.error('Redis SET error:', err);
+    }
+    // ----------------------
+
+    res.json(userData);
   } catch (error) {
     console.error('Error fetching from LeetCode:', error.message);
     if (error.response) {

@@ -408,7 +408,7 @@ const lightStyles = {
   toggleButton: {
     width: "100%",
     padding: "10px",
-    backgroundColor: "#007bff",
+    backgroundColor: "#000000",
     color: "white",
     border: "none",
     borderRadius: "8px",
@@ -649,7 +649,7 @@ const darkStyles = {
   toggleButton: {
     width: "100%",
     padding: "10px",
-    backgroundColor: "#238636",
+    backgroundColor: "#000000",
     color: "white",
     border: "none",
     borderRadius: "8px",

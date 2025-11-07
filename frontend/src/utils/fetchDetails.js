@@ -1,9 +1,10 @@
 import axios from "axios";
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-export async function fetchProfile(username) {
+export async function fetchProfile(username, refresh = false) {
     try {
         const response = await axios.post(`${API_URL}/leetcode`, {
             username,
+            refresh, // Send the refresh flag to the backend
         });
 
         return response.data;
