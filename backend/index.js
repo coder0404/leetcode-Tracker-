@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const app = express();
 const PORT = 5000;
-
+  
 console.log('Starting server...');
 console.log('Port:', PORT);
 
@@ -34,7 +34,7 @@ app.post('/leetcode', async (req, res) => {
     return res.status(400).json({ error: 'Username is required' });
   }
 
-  // Your existing GraphQL query code...
+  // GraphQL query
   const query = `
     query getUserProfile($username: String!) {
       matchedUser(username: $username) {

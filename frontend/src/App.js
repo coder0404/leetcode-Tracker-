@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchProfile } from "./utils/fetchDetails";
 
-const usernames = ["reaper_04", "DoctorMisterDoctor","aayushbarhate","Phineas_Phreak","KDOT2809"];
+const usernames = ["reaper_04","aayushbarhate","Phineas_Phreak","KDOT2809","tanishq_kochar"];
 
 function countWeeklySolves(submissionCalendar) {
   if (!submissionCalendar) return 0;
@@ -21,8 +21,7 @@ function countWeeklySolves(submissionCalendar) {
 }
 
 function getRecentWeeklySolves(recentList) {
-  // Since we don't have recent submissions, return empty array for now
-  // This can be enhanced later if needed
+  // iska calc badme kro
   return [];
 }
 
