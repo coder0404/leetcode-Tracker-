@@ -51,7 +51,6 @@ async function fetchAllProfiles(usernames, refresh = false) {
 
 function App() {
   const [userProfiles, setUserProfiles] = useState([]);
-  const [showRecent, setShowRecent] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(true);
@@ -87,13 +86,6 @@ function App() {
 
   const handleRefresh = () => {
     getData(true);
-  };
-
-  const toggleRecent = (username) => {
-    setShowRecent((prev) => ({
-      ...prev,
-      [username]: !prev[username],
-    }));
   };
 
   const toggleDarkMode = () => {
