@@ -35,9 +35,9 @@ function getDifficultyColor(difficulty) {
   return colors[difficulty] || '#6c757d';
 }
 
-async function fetchAllProfiles(usernames) {
+async function fetchAllProfiles(usernames, refresh = false) {
   const results = await Promise.all(
-    usernames.map((username) => fetchProfile(username))
+    usernames.map((username) => fetchProfile(username, refresh))
   );
   return results
     .filter((profile) => profile !== null)
@@ -55,23 +55,39 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const getData = async (refresh = false) => {
+    console.log('getData called with refresh:', refresh);
+    try {
+      if (!refresh) {
+        setLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
+      setError(null);
+      console.log('About to fetch profiles for:', usernames);
+      const profiles = await fetchAllProfiles(usernames, refresh);
+      console.log('Fetched profiles:', profiles);
+      setUserProfiles(profiles);
+    } catch (err) {
+      console.error('Error in getData:', err);
+      setError("Failed to fetch user profiles");
+      console.error(err);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const getData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const profiles = await fetchAllProfiles(usernames);
-        setUserProfiles(profiles);
-      } catch (err) {
-        setError("Failed to fetch user profiles");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    getData();
+    console.log('useEffect running - calling getData');
+    getData(false);
   }, []);
+
+  const handleRefresh = () => {
+    getData(true);
+  };
 
   const toggleRecent = (username) => {
     setShowRecent((prev) => ({
@@ -119,9 +135,14 @@ function App() {
     <div style={currentStyles.container}>
       <div style={currentStyles.header}>
         <h1 style={currentStyles.title}> LeetCode Tracker</h1>
-        <button onClick={toggleDarkMode} style={currentStyles.themeToggle}>
-          {darkMode ? '☀︎' : '⏾'}
-        </button>
+        <div>
+          <button onClick={handleRefresh} style={currentStyles.refreshButton} disabled={isRefreshing}>
+            {isRefreshing ? '🔄 Refreshing...' : '🔄 Refresh'}
+          </button>
+          <button onClick={toggleDarkMode} style={currentStyles.themeToggle}>
+            {darkMode ? '☀︎' : '⏾'}
+          </button>
+        </div>
       </div>
       
       {/* Leaderboard */}
@@ -225,8 +246,19 @@ const lightStyles = {
     fontWeight: "bold",
     margin: "0",
   },
+  refreshButton: {
+    backgroundColor: '#000000',
+    color: 'white',
+    border: 'none',
+    borderRadius: '10px',
+    padding: '10px 20px',
+    fontSize: '1rem',
+    cursor: 'pointer',
+    marginRight: '15px',
+    transition: 'background-color 0.3s',
+  },
   themeToggle: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#000000",
     color: "white",
     border: "none",
     borderRadius: "50%",
@@ -464,8 +496,19 @@ const darkStyles = {
     fontWeight: "bold",
     margin: "0",
   },
+  refreshButton: {
+    backgroundColor: '#000000',
+    color: 'white',
+    border: 'none',
+    borderRadius: '10px',
+    padding: '10px 20px',
+    fontSize: '1rem',
+    cursor: 'pointer',
+    marginRight: '15px',
+    transition: 'background-color 0.3s',
+  },
   themeToggle: {
-    backgroundColor: "#238636",
+    backgroundColor: "#000000",
     color: "white",
     border: "none",
     borderRadius: "50%",
