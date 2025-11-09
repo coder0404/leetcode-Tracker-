@@ -3,28 +3,6 @@ import { fetchProfile } from "./utils/fetchDetails";
 
 const usernames = ["reaper_04","aayushbarhate","Phineas_Phreak","KDOT2809","tanishq_kochar"];
 
-function countWeeklySolves(submissionCalendar) {
-  if (!submissionCalendar) return 0;
-  
-  // submissionCalendar is a JSON string with timestamps and submission counts
-  const calendar = JSON.parse(submissionCalendar);
-  const oneWeekAgo = Math.floor(Date.now() / 1000) - 7 * 24 * 60 * 60;
-  
-  let weeklyCount = 0;
-  for (const [timestamp, count] of Object.entries(calendar)) {
-    if (parseInt(timestamp) >= oneWeekAgo) {
-      weeklyCount += count;
-    }
-  }
-  
-  return weeklyCount;
-}
-
-function getRecentWeeklySolves(recentList) {
-  // iska calc badme kro
-  return [];
-}
-
 // Function to get difficulty color
 function getDifficultyColor(difficulty) {
   const colors = {
@@ -41,11 +19,6 @@ async function fetchAllProfiles(usernames, refresh = false) {
   );
   return results
     .filter((profile) => profile !== null)
-    .map((profile) => ({
-      ...profile,
-      weeklySolves: countWeeklySolves(profile.submissionCalendar),
-      weeklySubmissions: getRecentWeeklySolves(profile.recentSubmissions),
-    }))
     .sort((a, b) => b.weeklySolves - a.weeklySolves);
 }
 

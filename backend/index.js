@@ -14,6 +14,8 @@ console.log('Port:', PORT);
 app.use(cors({
   origin: [
     'https://leetcode-tracker-gamma.vercel.app',
+    'https://www.lctracker.app',
+    'https://lctracker.app',
     'http://localhost:3000' 
   ],
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -110,6 +112,40 @@ app.post('/leetcode', async (req, res) => {
     }
 
     const userData = response.data.data.matchedUser;
+
+    //Calculation for Weekly Solves
+    const currentTotalSolves = userData.submitStats.acSubmissionNum.find(
+      item => item.difficulty === 'All'
+    )?.count || 0;
+
+    // Create a unique Redis key for this user's Monday baseline
+    const mondayKey = `monday_baseline:${username}`;
+    let mondayBaseline = await redisClient.get(mondayKey);
+
+    if (!mondayBaseline) {
+      mondayBaseline = currentTotalSolves;
+
+      const now = new Date();
+      const currentDay = now.getUTCDay(); 
+      const daysUntilMonday = (8 - currentDay) % 7 || 7;
+      const nextMonday = new Date(now);
+      nextMonday.setUTCDate(now.getUTCDate() + daysUntilMonday);
+      nextMonday.setUTCHours(0, 0, 0, 0); 
+      const secondsUntilMonday = Math.floor((nextMonday - now) / 1000);
+      
+      // Store baseline in Redis with auto-expiration
+      await redisClient.set(mondayKey, mondayBaseline.toString(), {
+        EX: secondsUntilMonday
+      });
+      console.log(`Set Monday baseline for ${username}: ${mondayBaseline} (expires in ${secondsUntilMonday}s)`);
+    } else {
+      mondayBaseline = parseInt(mondayBaseline);
+      console.log(`Using existing Monday baseline for ${username}: ${mondayBaseline}`);
+    }
+
+    userData.weeklySolves = Math.max(0, currentTotalSolves - mondayBaseline);
+    console.log(`${username} weekly solves: ${userData.weeklySolves} (current: ${currentTotalSolves}, baseline: ${mondayBaseline})`);
+
 
     // --- Store in Cache ---
     try {

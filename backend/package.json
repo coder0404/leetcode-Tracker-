@@ -1,6 +1,7 @@
 {
   "name": "leetcode-tracker-backend",
   "version": "1.0.0",
+  "type": "commonjs",
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js"

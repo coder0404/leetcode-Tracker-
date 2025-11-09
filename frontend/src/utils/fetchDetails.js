@@ -4,7 +4,7 @@ export async function fetchProfile(username, refresh = false) {
     try {
         const response = await axios.post(`${API_URL}/leetcode`, {
             username,
-            refresh, // Send the refresh flag to the backend
+            refresh, 
         });
 
         return response.data;
